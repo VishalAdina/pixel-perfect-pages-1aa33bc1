@@ -284,7 +284,7 @@ function Index() {
   };
 
   const s = selected ? SCRIPTS[selected] : null;
-  const blurred = callStage === "connecting" || callStage === "live";
+  const blurred = callStage !== "idle";
 
   return (
     <>
@@ -561,7 +561,8 @@ function Index() {
                     <span>Pulling up conversation context…</span>
                   </div>
                 ) : (
-                  <LiveTranscript />
+                  <LiveTranscript onFinished={endCall} />
+
 
                 )}
               </div>
