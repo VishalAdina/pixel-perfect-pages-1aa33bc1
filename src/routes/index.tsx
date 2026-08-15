@@ -46,8 +46,9 @@ const SCRIPTS: Record<string, { role: string; active: string; greeting: string }
     role: "Sales",
     active: "Sales & Growth",
     greeting:
-      "Hi! I'm Maya, your Sales Assistant. I help turn website visitors into qualified leads. Want to see how I score leads or try a voice call?",
+      "Hi! I'm Maya, your sales assistant. 👋\n\nI'm here to help you find the right products, answer your questions, and give you more information about what we offer.\n\nHave a question about a product, pricing, features, availability, or recommendations? Just ask me — I'm happy to help!",
   },
+
   dexter: {
     role: "Local Services",
     active: "Bookings & Support",
