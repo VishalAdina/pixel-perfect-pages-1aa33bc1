@@ -912,6 +912,13 @@
   gap: 14px;
   max-height: 260px;
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.kg-call-layer .live-transcript::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 .kg-call-layer .live-line {
   opacity: 0;
