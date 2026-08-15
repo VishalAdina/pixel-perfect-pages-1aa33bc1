@@ -138,7 +138,7 @@ type CallStage = "idle" | "incoming" | "declined" | "connecting" | "live";
 function Index() {
   const [booting, setBooting] = useState(true);
   const [bootHide, setBootHide] = useState(false);
-  const [selected, setSelected] = useState<EmpId | null>("maya");
+  const [selected, setSelected] = useState<EmpId | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [connecting, setConnecting] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -190,10 +190,11 @@ function Index() {
     );
   };
 
-  useEffect(() => {
-    if (selected) greet(selected, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const scrollToBottom = () => {
+    if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
+  };
+
+
 
   const selectEmployee = (id: EmpId) => {
     if (selected === id || !SCRIPTS[id]) return;
