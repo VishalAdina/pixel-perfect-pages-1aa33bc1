@@ -77,6 +77,44 @@ function timeNow() {
   return `${h}:${m} ${d.getHours() >= 12 ? "PM" : "AM"}`;
 }
 
+function Typewriter({
+  text,
+  onTick,
+  onDone,
+}: {
+  text: string;
+  onTick?: () => void;
+  onDone?: () => void;
+}) {
+  const [shown, setShown] = useState("");
+  const tickRef = useRef(onTick);
+  const doneRef = useRef(onDone);
+  tickRef.current = onTick;
+  doneRef.current = onDone;
+
+  useEffect(() => {
+    const byWord = text.length > 140;
+    const chunks = byWord ? text.match(/\S+\s*/g) || [text] : Array.from(text);
+    const step = byWord ? 55 : 18;
+    let i = 0;
+    setShown("");
+    const timer = setInterval(() => {
+      i += 1;
+      setShown(chunks.slice(0, i).join(""));
+      tickRef.current?.();
+      if (i >= chunks.length) {
+        clearInterval(timer);
+        doneRef.current?.();
+      }
+    }, step);
+    return () => clearInterval(timer);
+  }, [text]);
+
+  return <span style={{ whiteSpace: "pre-line" }}>{shown}</span>;
+}
+
+
+
 function getReply(id: string, text: string) {
   const lower = text.toLowerCase();
   if (id === "maya") {
