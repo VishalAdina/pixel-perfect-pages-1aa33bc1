@@ -381,9 +381,14 @@ function Index() {
                             </div>
                           )}
                           <div className="bubble">
-                            {m.text}
+                            {m.side === "ai" ? (
+                              <Typewriter text={m.text} onTick={scrollToBottom} />
+                            ) : (
+                              m.text
+                            )}
                             {m.side === "user" && <div className="msg-time">{m.time}</div>}
                           </div>
+
                         </div>
                       ))}
                       {typing && (
