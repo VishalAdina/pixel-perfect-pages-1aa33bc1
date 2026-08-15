@@ -135,6 +135,54 @@ function getReply(id: string, text: string) {
 type Msg = { who: EmpId; side: "ai" | "user"; text: string; time: string };
 type CallStage = "idle" | "incoming" | "declined" | "connecting" | "live";
 
+const LIVE_LINES = [
+  "Hi sir, I understand you were looking for a replacement for the oversized T-shirt.",
+  "As per your request, we've processed the replacement. Please visit the store and show your order details to claim the replacement.",
+];
+const LIVE_TAGS = ["Customer request detected", "Replacement processed", "Store visit required"];
+
+function LiveTranscript() {
+  const [count, setCount] = useState(1);
+  const [finished, setFinished] = useState(false);
+
+  const handleDone = (i: number) => {
+    if (i < LIVE_LINES.length - 1) {
+      setTimeout(() => setCount((c) => Math.max(c, i + 2)), 600);
+    } else {
+      setTimeout(() => setFinished(true), 400);
+    }
+  };
+
+  return (
+    <>
+      <div className="live-transcript">
+        {LIVE_LINES.slice(0, count).map((t, i) => (
+          <div key={i} className="live-line" style={{ animationDelay: "0ms" }}>
+            <div className="speaker">Maya</div>
+            <div className="text">
+              <Typewriter text={t} onDone={() => handleDone(i)} />
+            </div>
+          </div>
+        ))}
+      </div>
+      {finished && (
+        <div className="live-tags">
+          {LIVE_TAGS.map((b, i) => (
+            <span
+              key={b}
+              className={`live-tag${i < 2 ? " done" : ""}`}
+              style={{ animationDelay: `${i * 350}ms` }}
+            >
+              {b}
+            </span>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+
 function Index() {
   const [booting, setBooting] = useState(true);
   const [bootHide, setBootHide] = useState(false);
