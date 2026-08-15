@@ -135,50 +135,46 @@ function getReply(id: string, text: string) {
 type Msg = { who: EmpId; side: "ai" | "user"; text: string; time: string };
 type CallStage = "idle" | "incoming" | "declined" | "connecting" | "live";
 
-const LIVE_LINES = [
-  "Hi sir, I understand you were looking for a replacement for the oversized T-shirt.",
-  "As per your request, we've processed the replacement. Please visit the store and show your order details to claim the replacement.",
+const LIVE_LINES: { speaker: string; text: string }[] = [
+  {
+    speaker: "Customer",
+    text: "Hi, I received the oversized T-shirt, and I'd like to replace it with a smaller size.",
+  },
+  {
+    speaker: "Maya",
+    text: "Hi! I understand. I've checked your order and the replacement is eligible. I can help you process it.",
+  },
+  { speaker: "Customer", text: "Great. Can I get the same T-shirt in Medium?" },
+  {
+    speaker: "Maya",
+    text: "Absolutely. Your replacement has been processed for Medium. Please visit the store and show your order details to collect it.",
+  },
 ];
-const LIVE_TAGS = ["Customer request detected", "Replacement processed", "Store visit required"];
 
-function LiveTranscript() {
+function LiveTranscript({ onFinished }: { onFinished: () => void }) {
   const [count, setCount] = useState(1);
-  const [finished, setFinished] = useState(false);
+  const endRef = useRef(onFinished);
+  endRef.current = onFinished;
 
   const handleDone = (i: number) => {
     if (i < LIVE_LINES.length - 1) {
       setTimeout(() => setCount((c) => Math.max(c, i + 2)), 600);
     } else {
-      setTimeout(() => setFinished(true), 400);
+      setTimeout(() => endRef.current(), 900);
     }
   };
 
   return (
-    <>
-      <div className="live-transcript">
-        {LIVE_LINES.slice(0, count).map((t, i) => (
-          <div key={i} className="live-line" style={{ animationDelay: "0ms" }}>
-            <div className="speaker">Maya</div>
-            <div className="text">
-              <Typewriter text={t} onDone={() => handleDone(i)} />
-            </div>
+    <div className="live-transcript">
+      {LIVE_LINES.slice(0, count).map((l, i) => (
+        <div key={i} className="live-line">
+          <div className="speaker">{l.speaker}</div>
+          <div className="text">
+            <Typewriter text={l.text} onDone={() => handleDone(i)} />
           </div>
-        ))}
-      </div>
-      {finished && (
-        <div className="live-tags">
-          {LIVE_TAGS.map((b, i) => (
-            <span
-              key={b}
-              className={`live-tag${i < 2 ? " done" : ""}`}
-              style={{ animationDelay: `${i * 350}ms` }}
-            >
-              {b}
-            </span>
-          ))}
         </div>
-      )}
-    </>
+      ))}
+    </div>
   );
 }
 

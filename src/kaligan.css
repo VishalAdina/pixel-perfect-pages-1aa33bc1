@@ -1134,6 +1134,8 @@
 @media (max-width: 880px) {
   .kg .dashboard {
     flex-direction: column;
+    height: auto;
+    max-height: none;
   }
   .kg .sidebar {
     width: 100%;
