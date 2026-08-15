@@ -486,6 +486,9 @@ function Index() {
                 <div className="pill-avatar">
                   <Avatar id="maya" className="msg-avatar" />
                   <div className="pulse-ring" />
+                  <div className="pulse-ring delay-1" />
+                  <div className="pulse-ring delay-2" />
+
                 </div>
                 <div className="pill-text">
                   <span className="pill-name">Maya</span>
@@ -514,38 +517,8 @@ function Index() {
                     <span>Pulling up conversation context…</span>
                   </div>
                 ) : (
-                  <>
-                    <div className="live-transcript">
-                      {[
-                        "Hi sir, I understand you were looking for a replacement for the oversized T-shirt.",
-                        "As per your request, we've processed the replacement. Please visit the store and show your order details to claim the replacement.",
-                      ].map((t, i) => (
-                        <div
-                          key={i}
-                          className="live-line"
-                          style={{ animationDelay: `${i * 950}ms` }}
-                        >
-                          <div className="speaker">Maya</div>
-                          <div className="text">{t}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="live-tags">
-                      {[
-                        "Customer request detected",
-                        "Replacement processed",
-                        "Store visit required",
-                      ].map((b, i) => (
-                        <span
-                          key={b}
-                          className={`live-tag${i < 2 ? " done" : ""}`}
-                          style={{ animationDelay: `${2100 + i * 500}ms` }}
-                        >
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-                  </>
+                  <LiveTranscript />
+
                 )}
               </div>
             </>
