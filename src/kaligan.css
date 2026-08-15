@@ -800,8 +800,16 @@
   inset: -5px;
   border-radius: 50%;
   border: 2px solid var(--navy);
-  animation: kgPulse 1.8s ease-out infinite;
+  opacity: 0;
+  animation: kgPulse 2.4s cubic-bezier(0.24, 0.6, 0.36, 1) infinite;
 }
+.kg-call-layer .pulse-ring.delay-1 {
+  animation-delay: 0.8s;
+}
+.kg-call-layer .pulse-ring.delay-2 {
+  animation-delay: 1.6s;
+}
+
 .kg-call-layer .pill-text {
   display: flex;
   flex-direction: column;
@@ -1076,18 +1084,19 @@
 }
 @keyframes kgPulse {
   0% {
-    opacity: 0.65;
-    transform: scale(0.9);
+    opacity: 0.55;
+    transform: scale(0.92);
   }
-  70% {
-    opacity: 0;
-    transform: scale(1.35);
+  60% {
+    opacity: 0.14;
+    transform: scale(1.28);
   }
   100% {
     opacity: 0;
-    transform: scale(1.35);
+    transform: scale(1.5);
   }
 }
+
 @keyframes kgBlink {
   0%,
   100% {

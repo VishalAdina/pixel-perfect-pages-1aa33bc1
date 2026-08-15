@@ -46,8 +46,9 @@ const SCRIPTS: Record<string, { role: string; active: string; greeting: string }
     role: "Sales",
     active: "Sales & Growth",
     greeting:
-      "Hi! I'm Maya, your Sales Assistant. I help turn website visitors into qualified leads. Want to see how I score leads or try a voice call?",
+      "Hi! I'm Maya, your sales assistant. 👋\n\nI'm here to help you find the right products, answer your questions, and give you more information about what we offer.\n\nHave a question about a product, pricing, features, availability, or recommendations? Just ask me — I'm happy to help!",
   },
+
   dexter: {
     role: "Local Services",
     active: "Bookings & Support",
@@ -76,6 +77,44 @@ function timeNow() {
   return `${h}:${m} ${d.getHours() >= 12 ? "PM" : "AM"}`;
 }
 
+function Typewriter({
+  text,
+  onTick,
+  onDone,
+}: {
+  text: string;
+  onTick?: () => void;
+  onDone?: () => void;
+}) {
+  const [shown, setShown] = useState("");
+  const tickRef = useRef(onTick);
+  const doneRef = useRef(onDone);
+  tickRef.current = onTick;
+  doneRef.current = onDone;
+
+  useEffect(() => {
+    const byWord = text.length > 140;
+    const chunks = byWord ? text.match(/\S+\s*/g) || [text] : Array.from(text);
+    const step = byWord ? 55 : 18;
+    let i = 0;
+    setShown("");
+    const timer = setInterval(() => {
+      i += 1;
+      setShown(chunks.slice(0, i).join(""));
+      tickRef.current?.();
+      if (i >= chunks.length) {
+        clearInterval(timer);
+        doneRef.current?.();
+      }
+    }, step);
+    return () => clearInterval(timer);
+  }, [text]);
+
+  return <span style={{ whiteSpace: "pre-line" }}>{shown}</span>;
+}
+
+
+
 function getReply(id: string, text: string) {
   const lower = text.toLowerCase();
   if (id === "maya") {
@@ -96,10 +135,58 @@ function getReply(id: string, text: string) {
 type Msg = { who: EmpId; side: "ai" | "user"; text: string; time: string };
 type CallStage = "idle" | "incoming" | "declined" | "connecting" | "live";
 
+const LIVE_LINES = [
+  "Hi sir, I understand you were looking for a replacement for the oversized T-shirt.",
+  "As per your request, we've processed the replacement. Please visit the store and show your order details to claim the replacement.",
+];
+const LIVE_TAGS = ["Customer request detected", "Replacement processed", "Store visit required"];
+
+function LiveTranscript() {
+  const [count, setCount] = useState(1);
+  const [finished, setFinished] = useState(false);
+
+  const handleDone = (i: number) => {
+    if (i < LIVE_LINES.length - 1) {
+      setTimeout(() => setCount((c) => Math.max(c, i + 2)), 600);
+    } else {
+      setTimeout(() => setFinished(true), 400);
+    }
+  };
+
+  return (
+    <>
+      <div className="live-transcript">
+        {LIVE_LINES.slice(0, count).map((t, i) => (
+          <div key={i} className="live-line" style={{ animationDelay: "0ms" }}>
+            <div className="speaker">Maya</div>
+            <div className="text">
+              <Typewriter text={t} onDone={() => handleDone(i)} />
+            </div>
+          </div>
+        ))}
+      </div>
+      {finished && (
+        <div className="live-tags">
+          {LIVE_TAGS.map((b, i) => (
+            <span
+              key={b}
+              className={`live-tag${i < 2 ? " done" : ""}`}
+              style={{ animationDelay: `${i * 350}ms` }}
+            >
+              {b}
+            </span>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+
 function Index() {
   const [booting, setBooting] = useState(true);
   const [bootHide, setBootHide] = useState(false);
-  const [selected, setSelected] = useState<EmpId | null>("maya");
+  const [selected, setSelected] = useState<EmpId | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [connecting, setConnecting] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -151,10 +238,11 @@ function Index() {
     );
   };
 
-  useEffect(() => {
-    if (selected) greet(selected, true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const scrollToBottom = () => {
+    if (scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight;
+  };
+
+
 
   const selectEmployee = (id: EmpId) => {
     if (selected === id || !SCRIPTS[id]) return;
@@ -341,9 +429,14 @@ function Index() {
                             </div>
                           )}
                           <div className="bubble">
-                            {m.text}
+                            {m.side === "ai" ? (
+                              <Typewriter text={m.text} onTick={scrollToBottom} />
+                            ) : (
+                              m.text
+                            )}
                             {m.side === "user" && <div className="msg-time">{m.time}</div>}
                           </div>
+
                         </div>
                       ))}
                       {typing && (
@@ -441,6 +534,9 @@ function Index() {
                 <div className="pill-avatar">
                   <Avatar id="maya" className="msg-avatar" />
                   <div className="pulse-ring" />
+                  <div className="pulse-ring delay-1" />
+                  <div className="pulse-ring delay-2" />
+
                 </div>
                 <div className="pill-text">
                   <span className="pill-name">Maya</span>
@@ -469,38 +565,8 @@ function Index() {
                     <span>Pulling up conversation context…</span>
                   </div>
                 ) : (
-                  <>
-                    <div className="live-transcript">
-                      {[
-                        "Hi sir, I understand you were looking for a replacement for the oversized T-shirt.",
-                        "As per your request, we've processed the replacement. Please visit the store and show your order details to claim the replacement.",
-                      ].map((t, i) => (
-                        <div
-                          key={i}
-                          className="live-line"
-                          style={{ animationDelay: `${i * 950}ms` }}
-                        >
-                          <div className="speaker">Maya</div>
-                          <div className="text">{t}</div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="live-tags">
-                      {[
-                        "Customer request detected",
-                        "Replacement processed",
-                        "Store visit required",
-                      ].map((b, i) => (
-                        <span
-                          key={b}
-                          className={`live-tag${i < 2 ? " done" : ""}`}
-                          style={{ animationDelay: `${2100 + i * 500}ms` }}
-                        >
-                          {b}
-                        </span>
-                      ))}
-                    </div>
-                  </>
+                  <LiveTranscript />
+
                 )}
               </div>
             </>
